@@ -12,18 +12,32 @@
 # • ler(arquivo)2
 # : deve carregar um grafo a partir de um arquivo no formato especificado ao final deste documento.
 
-def qtdVertices():
-    pass
+from collections import defaultdict
 
-def qtdArestas():
-    pass
-def grau(v):
-    pass
-def rotulo(v):
-    pass
-def vizinhos(v):
-    pass
-def haAresta(u, v):
-    pass
-def peso(u, v):
-    pass
+class Grafo:
+    def __init__(self):
+        self.verticesNames = {} # índice → rótulo
+        self.osVizinhos = defaultdict(dict) # índice → {vizinho: peso}
+        self.numArestas = 0
+
+
+    def qtdVertices(self):
+        return len(self.verticesNames)
+
+    def qtdArestas(self):
+        return self.numArestas
+    
+    def grau(self, v):
+        return len(self.osVizinhos[v])
+    
+    def rotulo(self, v):
+        return self.verticesNames.get(v, None) #retorna o rotulo/nome de um vertice especifico
+
+    def vizinhos(self, v):
+        return list(self.osVizinhos[v].keys())
+
+    def haAresta(self, u, v):
+        return v in self.osVizinhos[u]
+
+    def peso(self, u, v):
+        return self.osVizinhos[u].get(v, float('inf'))
