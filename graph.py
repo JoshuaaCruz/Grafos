@@ -15,11 +15,27 @@
 from collections import defaultdict
 
 class Grafo:
-    def __init__(self):
+    def __init__(self, arquivo=None):
         self.verticesNames = {} # índice → rótulo
         self.osVizinhos = defaultdict(dict) # índice → {vizinho: peso}
         self.numArestas = 0
 
+        if arquivo:
+            self.ler_arquivo(arquivo)
+
+    def ler_arquivo(self, arquivo):
+        with open(arquivo, 'r') as f:
+            for linha in f:
+                partes = linha.strip().split()
+                if len(partes) == 2: # linha de vertices n
+                    indice, rotulo = partes
+                    self.verticesNames[int(indice)] = rotulo
+                elif len(partes) == 3: # linha de aresta a b valor_peso
+                    u, v, peso = partes
+                    u, v, peso = int(u), int(v), float(peso)
+                    self.osVizinhos[u][v] = peso
+                    self.osVizinhos[v][u] = peso # grafo não-dirigido
+                    self.numArestas += 1
 
     def qtdVertices(self):
         return len(self.verticesNames)
