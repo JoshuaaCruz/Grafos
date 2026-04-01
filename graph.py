@@ -24,18 +24,41 @@ class Grafo:
             self.ler_arquivo(arquivo)
 
     def ler_arquivo(self, arquivo):
-        with open(arquivo, 'r') as f:
-            for linha in f:
-                partes = linha.strip().split()
-                if len(partes) == 2: # linha de vertices n
-                    indice, rotulo = partes
-                    self.verticesNames[int(indice)] = rotulo
-                elif len(partes) == 3: # linha de aresta a b valor_peso
-                    u, v, peso = partes
-                    u, v, peso = int(u), int(v), float(peso)
-                    self.osVizinhos[u][v] = peso
-                    self.osVizinhos[v][u] = peso # grafo não-dirigido
-                    self.numArestas += 1
+        with open(arquivo, 'r', encoding='utf-8') as f:
+            linhas = f.readlines()
+            
+            lendo_vertices = False
+            lendo_arestas = False
+
+            for linha in linhas:
+                linha = linha.strip()
+                if not linha: continue 
+
+                if "*vertices" in linha.lower():
+                    lendo_vertices = True
+                    lendo_arestas = False
+                    continue
+                elif "*edges" in linha.lower() or "*arcs" in linha.lower():
+                    lendo_vertices = False
+                    lendo_arestas = True
+                    continue
+
+                partes = linha.split()
+
+                if lendo_vertices:
+                    if len(partes) >= 2:
+                        indice = int(partes[0])
+                        rotulo = " ".join(partes[1:]).replace('"', '')
+                        self.verticesNames[indice] = rotulo
+
+                elif lendo_arestas:
+                    if len(partes) >= 2:
+                        u, v = int(partes[0]), int(partes[1])
+                        peso = float(partes[2]) if len(partes) > 2 else 1.0
+                        
+                        self.osVizinhos[u][v] = peso
+                        self.osVizinhos[v][u] = peso
+                        self.numArestas += 1
 
     def qtdVertices(self):
         return len(self.verticesNames)
