@@ -19,6 +19,7 @@ def floyd_warshall(grafo):
 
     return matriz_fw[grafo.qtdVertices()]
 
+
 def floyd_warshall_op(grafo):
     matriz_fw = matriz_adjacencias(grafo)
     vertices_ordenados = sorted(list(grafo.verticesNames.keys()))
@@ -32,7 +33,6 @@ def floyd_warshall_op(grafo):
                 ))
 
     return matriz_fw
-
 
 
 def matriz_adjacencias(grafo):
@@ -58,5 +58,3 @@ for i in matriz:
         print(f"{i[n]},", end="")
     print(f"{i[len(i) - 1]}\n", end="")
     contador += 1
-
-

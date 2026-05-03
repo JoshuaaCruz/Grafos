@@ -9,7 +9,7 @@ from graph import Grafo
 from collections import deque
 
 def bfs(grafo, vi):
-    visitados = {vi}
+    #visitados = {vi}
     distancia = {vi: 0}
 
     fila = deque([vi])
@@ -17,8 +17,8 @@ def bfs(grafo, vi):
     while fila:
         vertice = fila.popleft()
         for vizinho in grafo.osVizinhos[vertice]:
-            if vizinho not in visitados:
-                visitados.add(vizinho)
+            if vizinho not in distancia:
+                #visitados.add(vizinho)
                 distancia[vizinho] = distancia[vertice] + 1
                 fila.append(vizinho)
 
@@ -39,7 +39,7 @@ distancia = bfs(g, vertice_inicial)
 niveis = {}
 for vertice, d in distancia.items():
     if d not in niveis:
-        niveis[d] = [] 
+        niveis[d] = []
     niveis[d].append(vertice)
 
 for nivel in sorted(niveis.keys()):
