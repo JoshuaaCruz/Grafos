@@ -19,6 +19,7 @@ class Grafo:
         self.verticesNames = {} # índice → rótulo
         self.osVizinhos = defaultdict(dict) # índice → {vizinho: peso}
         self.numArestas = 0
+        self.direcionado = False
 
         if arquivo:
             self.ler_arquivo(arquivo)
@@ -38,9 +39,14 @@ class Grafo:
                     lendo_vertices = True
                     lendo_arestas = False
                     continue
-                elif "*edges" in linha.lower() or "*arcs" in linha.lower():
+                elif "*edges" in linha.lower():
                     lendo_vertices = False
                     lendo_arestas = True
+                    continue
+                elif "*arcs" in linha.lower():
+                    lendo_vertices = False
+                    lendo_arestas = True
+                    self.direcionado = True
                     continue
 
                 partes = linha.split()
@@ -57,7 +63,10 @@ class Grafo:
                         peso = float(partes[2]) if len(partes) > 2 else 1.0
                         
                         self.osVizinhos[u][v] = peso
-                        self.osVizinhos[v][u] = peso
+                        
+                        if not self.direcionado:
+                            self.osVizinhos[v][u] = peso
+
                         self.numArestas += 1
 
     def qtdVertices(self):
