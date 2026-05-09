@@ -9,7 +9,7 @@ from graph import Grafo
 def buscaProfundidade(grafo):
     conhecidos = set()
     ordem = deque()
-    tempo = [0]
+    tempo = 0
     T = {}
     F = {}
     for v in grafo.verticesNames.keys():
@@ -19,13 +19,13 @@ def buscaProfundidade(grafo):
 
 def buscaProfundidadeOT(grafo, v, conhecidos, T, F, ordem, tempo):
     conhecidos.add(v)
-    tempo[0] += 1
-    T[v] = tempo[0]
+    tempo += 1
+    T[v] = tempo
     for u in grafo.osVizinhos[v]:
         if u not in conhecidos:
             buscaProfundidadeOT(grafo, u, conhecidos, T, F, ordem, tempo)
-    tempo[0] += 1
-    F[v] = tempo[0]
+    tempo += 1
+    F[v] = tempo
     ordem.appendleft(v)
 
 if len(sys.argv) < 2:
