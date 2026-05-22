@@ -41,4 +41,4 @@ g.ler_arquivo(sys.argv[1])
 
 ordem = ordenacaoTopologica(g)
 resultado = " , ".join([g.verticesNames[v] for v in ordem])
-print("Ordem Topológica:", resultado)
+print(resultado)
