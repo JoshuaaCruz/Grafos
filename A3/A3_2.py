@@ -61,7 +61,6 @@ def DFS(grafo, mate, x, D):
         for y in vizinhos:
             if D[mate[y]] == D[x] + 1:
                 if DFS(grafo, mate, mate[y], D):
-                    temp = mate[y]
                     mate[y] = x
                     mate[x] = y
                     return True
