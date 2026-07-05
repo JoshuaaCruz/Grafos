@@ -1,69 +1,83 @@
 from collections import deque
+import sys
+import os
+
+# sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from graph import Grafo
-from sys import argv
 
 def hopcroft_karp(grafo):
-    # Divisão dos vértices em dois conjuntos U e V
-    todos_vertices = list(grafo.verticesNames.keys())
-    metade = grafo.qtdVertices() // 2
-    U = todos_vertices[:metade]
-    V = todos_vertices[metade:]
+    # Ordenação dos vértices + separação. Existência do Y por mera formalidade.
+    vertices = sorted(grafo.verticesNames)
+    X = vertices[0:(len(vertices) // 2)]
+    Y = vertices[(len(vertices) // 2):]
 
-    emparelhamento = {}
-    dist = {}
+    # Definição das demais estruturas.
+    D = dict()
+    for v in vertices:
+        D[v] = float("inf")
 
-    # método BFS para encontrar caminho aumentante
-    def bfs():
-        queue = deque()
-        for u in U:
-            dist[u] = 0 if u not in emparelhamento else float('inf')
-            if dist[u] == 0:
-                queue.append(u)
+    mate = dict()
+    for v in vertices:
+        mate[v] = None
 
-        dist[None] = float('inf')
+    m = 0
 
-        while queue:
-            u = queue.popleft()
-            if dist[u] < dist[None]:
-                for v in grafo.vizinhos(u):
-                    pair_u = emparelhamento.get(v)
-                    if dist.get(pair_u, float('inf')) == float('inf'):
-                        dist[pair_u] = dist[u] + 1
-                        queue.append(pair_u)
+    # Início da lógica. As instruções da apostila foram seguidas a risca.
+    while BFS(grafo, X, Y, mate, D):
+        for x in X:
+            if mate[x] is None:
+                if DFS(grafo, mate, x, D):
+                    m += 1
+    return m, mate
 
-        return dist[None] != float('inf')
+# Implementação BFS de acordo com a apostila
+def BFS(grafo, X, Y, mate, D):
+    infinity = float("inf")
+    Q = deque()
+    for x in X:
+        if mate[x] is None:
+            D[x] = 0
+            Q.append(x)
+        else:
+            D[x] = infinity
 
-    # função DFS para tentar expandir o emparelhamento
-    def dfs(u):
-        if u is None:
-            return True
-        for v in grafo.vizinhos(u):
-            pair_u = emparelhamento.get(v)
-            if dist.get(pair_u, float('inf')) == dist[u] + 1 and dfs(pair_u):
-                emparelhamento[v] = u
-                emparelhamento[u] = v
-                return True
-        dist[u] = float('inf')
+    D[None] = infinity
+
+    while len(Q) != 0:
+        x = Q.popleft()
+        if D[x] < D[None]:
+            vizinhos = grafo.vizinhos(x)
+            for y in vizinhos:
+                if D[mate[y]] == infinity:
+                    D[mate[y]] = D[x] + 1
+                    Q.append(mate[y])
+
+    return D[None] != infinity
+
+# Implementação DFS de acordo com a apostila
+def DFS(grafo, mate, x, D):
+    if x is not None:
+        vizinhos = grafo.vizinhos(x)
+        for y in vizinhos:
+            if D[mate[y]] == D[x] + 1:
+                if DFS(grafo, mate, mate[y], D):
+                    temp = mate[y]
+                    mate[y] = x
+                    mate[x] = y
+                    return True
+        D[x] = float("inf")
         return False
+    return True
 
-    n_emparelhamento = 0
-    while bfs():
-        for u in U:
-            if u not in emparelhamento and dfs(u):
-                n_emparelhamento += 1
-
-    # obtendo as arestas do emparelhamento
-    arestas_emparelhadas = [f"{u}-{emparelhamento[u]}" for u in U if u in emparelhamento]
-
-    return n_emparelhamento, arestas_emparelhadas
-
-def ex_2():
-    arquivo = argv[1]
-    grafo = Grafo(arquivo)
-    n_emparelhamento, arestas = hopcroft_karp(grafo)
-
-    # exibindo o resultado
-    print(n_emparelhamento)
-    print(", ".join(arestas))
-
-ex_2()
+g = Grafo()
+g.ler_arquivo(sys.argv[1])
+m, mate = hopcroft_karp(g)
+keys = list(mate.keys())
+lastKey = keys[len(keys) - 1]
+keys = keys[0:len(keys) - 1]
+print(m)
+for i in keys:
+    if mate[i] is None:
+        continue
+    print(str(i) + "-" + str(mate[i]), end=", ")
+print(str(lastKey) + "-" + str(mate[lastKey]))
